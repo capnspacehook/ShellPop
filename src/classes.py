@@ -1,4 +1,3 @@
-from obfuscators import randomize_vars
 from encoders import powershell_base64, xor, gzip_compress, to_unicode, to_urlencode
 from binascii import hexlify
 from binary import shellcode_to_hex, shellcode_to_ps1, WINDOWS_BLOODSEEKER_SCRIPT # imported since 0.3.6
@@ -112,14 +111,9 @@ def gzip_wrapper(name, code, args, shell="/bin/bash"):
     if args.shell is not "":
         shell = args.shell
     if args.gzip is True:
-        if "powershell" not in name.lower():
-            if "windows" not in name.lower():
-                code = gzip_compress(code)
-                code = code.encode("base64").replace("\n", "")
-                code = "echo {0}|base64 -d|gunzip -c|{1}".format(code, shell)
-        #else:
-            
-
+        code = gzip_compress(code)
+        code = code.encode("base64").replace("\n", "")
+        code = "echo {0}|base64 -d|gunzip -c|{1}".format(code, shell)
     return code
 
 

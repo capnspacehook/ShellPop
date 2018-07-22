@@ -53,6 +53,11 @@ def xor(data, key):
 
 
 def gzip_compress(data):
+    """
+    Gzip compress a string. Compressed data can be up to 50%
+    smaller. Currently only avalible for Linux payloads.
+    @capnspacehook
+    """
     fgz = StringIO.StringIO()
     gzip_obj = gzip.GzipFile(mode='wb', fileobj=fgz)
     gzip_obj.write(data)
