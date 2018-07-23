@@ -578,8 +578,8 @@ def main():
     parser.add_argument("-H", "--host", type=str, help="IP to be used in connectback (reverse) shells.")
     parser.add_argument("-P", "--port", type=int, help="Port to be used in reverse/bind shell code.")
     parser.add_argument("--number", type=int, help="Shell code index number", required=False)
-    parser.add_argument("--shell", type=str, default="",
-                        help="Terminal shell to be used when decoding some encoding scheme.", required=False)
+    parser.add_argument("--shell", type=str, default="/bin/sh",
+                        help="Terminal shell to be used if the payload spawns one. '/bin/sh' is used by defult.", required=False)
 
     # Shell Type
     payload_arg = parser.add_argument_group('Shell Types')
@@ -660,6 +660,9 @@ def main():
         write(header())
         print(error("Error: You can't select both --reverse and --bind options."))
         exit(1)
+
+    if args.shell not in ["/bin/bash", "/bin/dash", "/bin/fish", "/bin/ksh", "/bin/sh", "/bin/tcsh", "/bin/zsh"]:
+        print(alert("'{0}' is not a common UNIX shell, your payload may not work correctly...".format(args.shell)))
 
     if args.host in [str(x) for x in netifaces.interfaces()]:
         args.host = str(netifaces.ifaddresses(args.host)[2][0]["addr"])  # translate iface name to ipv4
