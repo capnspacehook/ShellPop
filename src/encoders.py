@@ -1,6 +1,7 @@
 from urllib import quote
 from binascii import hexlify
-import gzip 
+import gzip
+import bz2
 import StringIO
 
 
@@ -54,8 +55,7 @@ def xor(data, key):
 
 def gzip_compress(data):
     """
-    Gzip compress a string. Compressed data can be up to 50%
-    smaller. Currently only avalible for Linux payloads.
+    Gzip compress a string. Currently only available for Linux payloads.
     @capnspacehook
     """
     fgz = StringIO.StringIO()
@@ -67,3 +67,12 @@ def gzip_compress(data):
     fgz.close()
 
     return gzip_payload
+
+def bzip2_compress(data):
+    """
+    Bzip2 compress a string. Currently only available for Linux payloads.
+    @capnspacehook
+    """
+    bzip2_payload = bz2.compress(data)
+
+    return bzip2_payload
