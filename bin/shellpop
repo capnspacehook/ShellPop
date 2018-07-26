@@ -777,15 +777,15 @@ will only increase the payload size."))
 
     to_be_executed = shell.payload if stager is None else stager_payload
 
-    if args.clip is True:
-        pyperclip.copy(to_be_executed)
-        print(info("ShellPop code has been copied to clipboard."))
-
     if args.gzip is True and "multi" in shell.get_full_name():
         print(alert("This Gzip compressed payload will only work on Linux hosts."))
 
     if args.bzip2 is True and "multi" in shell.get_full_name():
         print(alert("This Bzip2 compressed payload will only work on Linux hosts."))
+
+    if args.clip is True:
+        pyperclip.copy(to_be_executed)
+        print(info("ShellPop code has been copied to clipboard."))
 
     print(info("Execute this code in remote target: \n\n{0}\n".format(to_be_executed)))
     
