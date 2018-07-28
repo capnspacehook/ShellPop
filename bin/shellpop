@@ -578,8 +578,8 @@ def main():
     parser.add_argument("-H", "--host", type=str, help="IP to be used in connectback (reverse) shells.")
     parser.add_argument("-P", "--port", type=int, help="Port to be used in reverse/bind shell code.")
     parser.add_argument("--number", type=int, help="Shell code index number", required=False)
-    parser.add_argument("--shell", type=str, default="/bin/sh",
-                        help="Terminal shell to be used if the payload spawns one. '/bin/sh' is used by defult.", required=False)
+    parser.add_argument("--shell", type=str, default="/bin/bash",
+                        help="Terminal shell to be used by payloads and decoding stubs. '/bin/bash' is used by defult.", required=False)
 
     # Shell Type
     payload_arg = parser.add_argument_group('Shell Types')
