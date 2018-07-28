@@ -599,8 +599,11 @@ def main():
                           help="Encode the command in URL encoding.")
 
     # Use handler if possible.
-    parser.add_argument("--handler", action="store_true", help="Use handler, if possible.", default=False,
+    handlers = parser.add_argument_group("Handlers")
+    handlers.add_argument("--handler", action="store_true", help="Use handler, if possible.", default=False,
                         required=False)
+    handlers.add_argument("--handler-auto-upgrade", action="store_true", help="Automatically upgrade shell to \
+    full TTY shell.", required=False)
 
     # Staging
     stagingarg = parser.add_argument_group("Staging Options")
@@ -756,6 +759,9 @@ def main():
 
     print(info("Execute this code in remote target: \n\n{0}\n".format(to_be_executed)))
     
+    if args.handler_auto_upgrade:
+        auto_upgrade_handler(args, shell.proto)
+
     if shell.handler is not None and args.handler is True:
         print(info("Starting shell handler ..."))
 	try:
