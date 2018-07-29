@@ -15,6 +15,7 @@
 #   Github: https://github.com/touhidshaikh
 
 
+from __future__ import division
 import pyperclip
 import netifaces
 import argcomplete
@@ -534,6 +535,8 @@ def select_shell(args, shell_type, shell_index):
                 rev = ReverseShell(name, args, code)
                 generated = rev.get()
                 obj.payload = generated
+                obj.decompSize = rev.decompSize
+                obj.compSize = rev.compSize
                 return obj
 
     elif shell_type == "bind":
@@ -545,6 +548,8 @@ def select_shell(args, shell_type, shell_index):
                 bind = BindShell(name, args, code)
                 generated = bind.get()
                 obj.payload = generated
+                obj.decompSize = bind.decompSize
+                obj.compSize = bind.compSize
                 return obj
 
 
@@ -591,8 +596,15 @@ def main():
     # Alternative way to select shell payloads, using auto-tab completion.
     payload_arg.add_argument("--payload", required=False, help="Choose the payload").completer = get_shells
 
+    # Compression options
+    compressors = parser.add_argument_group("Compression Options")
+    compressors.add_argument("--gzip", action="store_true", help="Compress Linux payloads with gzip. Fastest \
+    decompression time, worst compression size.", required=False)
+    compressors.add_argument("--bzip2", action="store_true", help="Compress Linux payloads with bzip2. Much slower \
+    decompression than gzip, can have better compression size if payload is sufficiently big.", required=False)
+
     # Available encodings
-    encoders = parser.add_argument_group('Encoders Options')
+    encoders = parser.add_argument_group('Encoding Options')
     encoders.add_argument("--xor", action="store_true",help="Enable XOR obfuscation", required=False)
     encoders.add_argument("--base64", action="store_true", required=False, help="Encode command in base64.")
     encoders.add_argument("--urlencode", action="store_true", required=False,
@@ -669,6 +681,13 @@ def main():
     else:
         args.xor = 0  # no Xor encoding!
 
+    if args.gzip and args.bzip2:
+        print(error("Error: You can't select both --gzip and --bzip2 options."))
+
+    if (args.gzip is True or args.bzip2 is True) and args.base64 is True:
+        print(alert("The --gzip and --bzip2 options automatically base64 encodes the payload, --base64 is unnecessary, and \
+will only increase the payload size."))
+
     if args.reverse is True:
         if not check_shell_number(args.number, reverse=True):
             print(error("Error: Invalid reverse shell number."))
@@ -694,6 +713,14 @@ def main():
             if args.host is None:
                 args.host = raw_input("[\033[092m*\033[0m] Remote host IP address: ")
             shell.handler_args = (args, shell)
+
+    if args.gzip is True and "windows" in shell.name.lower():
+        print(error("Error: Gzip compression is not available for Windows"))
+        exit(1)
+
+    if args.bzip2 is True and "windows" in shell.name.lower():
+        print(error("Error: Bzip2 compression is not available for Windows"))
+        exit(1)
 
     # This is the spot for stagers.
     # First, we need to detect if the operator
@@ -750,11 +777,41 @@ def main():
 
     to_be_executed = shell.payload if stager is None else stager_payload
 
+    if args.gzip is True and "multi" in shell.get_full_name():
+        print(alert("This Gzip compressed payload will only work on Linux hosts."))
+
+    if args.bzip2 is True and "multi" in shell.get_full_name():
+        print(alert("This Bzip2 compressed payload will only work on Linux hosts."))
+
     if args.clip is True:
         pyperclip.copy(to_be_executed)
         print(info("ShellPop code has been copied to clipboard."))
 
     print(info("Execute this code in remote target: \n\n{0}\n".format(to_be_executed)))
+    
+    # Print info about payload size
+    if args.stager is None:
+        print(info("Payload size: {0} characters.".format(len(to_be_executed))))
+        if args.gzip is True or args.bzip2 is True:
+            print(info("Decompressed payload size: {0} characters.".format(shell.decompSize)))
+            charsSaved = shell.decompSize - shell.compSize
+            percentSaved = 100 * (1 - (shell.compSize / shell.decompSize))
+            if charsSaved < 0:
+                print(alert("Payload size was increased {0} characters by compression, payload is already too small to be compressed effectively.".format(-charsSaved)))
+            else:
+                print(info("Compressed payload size is {0} characters smaller. Overall {1:.2f}% smaller.".format(charsSaved, percentSaved)))
+
+    if args.stager is not None:
+        print(info("1st stage payload size: {0} characters.".format(len(to_be_executed))))
+        print(info("2nd stage payload size: {0} characters.".format(len(shell.payload))))
+        if args.gzip is True or args.bzip2 is True:
+            print(info("Decompressed 2nd stage payload size: {0} characters.".format(shell.decompSize)))
+            charsSaved = shell.decompSize - shell.compSize
+            percentSaved = 100 * (1 - (shell.compSize / shell.decompSize))
+            if charsSaved < 0:
+                print(alert("2nd stage payload size was increased {0} characters by compression, payload is already too small to be compressed effectively.".format(-charsSaved)))
+            else:
+                print(info("Compressed 2nd stage payload size is {0} characters smaller. Overall {1:.2f}% smaller.".format(charsSaved, percentSaved)))
     
     if shell.handler is not None and args.handler is True:
         print(info("Starting shell handler ..."))
