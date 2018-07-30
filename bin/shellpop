@@ -662,8 +662,11 @@ def main():
     command will be as small as possible.")
 
     # Use handler if possible.
-    parser.add_argument("--handler", action="store_true", help="Use handler, if possible.", default=False,
+    handlers = parser.add_argument_group("Handlers")
+    handlers.add_argument("--handler", action="store_true", help="Use handler, if possible.", default=False,
                         required=False)
+    handlers.add_argument("--handler-auto-upgrade", action="store_true", help="Automatically upgrade shell to \
+    full TTY shell.", required=False)
 
     # Staging
     stagingarg = parser.add_argument_group("Staging Options")
@@ -866,6 +869,9 @@ will only increase the payload size."))
             else:
                 print(info("Compressed 2nd stage payload size is {0} characters smaller. Overall {1:.2f}% smaller.".format(charsSaved, percentSaved)))
     
+    if args.handler_auto_upgrade:
+        auto_upgrade_handler(args, shell.proto)
+
     if shell.handler is not None and args.handler is True:
         print(info("Starting shell handler ..."))
 	try:

