@@ -45,6 +45,7 @@ AVAILABLE_SHELLS = [
                 "tcp", # protocol
                 BIND_PYTHON_TCP(),  # code
                 system="linux",
+                lang="python",
                 arch="Independent",
                 use_handler=bind_tcp_pty_handler,
                 use_http_stager=LINUX_STAGERS),
@@ -55,6 +56,7 @@ AVAILABLE_SHELLS = [
                 "udp",
                 BIND_PYTHON_UDP(),
                 system="linux",
+                lang="python",
                 arch="Independent",
                 use_handler=None,
                 use_http_stager=LINUX_STAGERS),
@@ -65,6 +67,7 @@ AVAILABLE_SHELLS = [
                 "tcp",
                 BIND_PERL_TCP(),
                 system="linux",
+                lang="perl",
                 arch="Independent",
                 use_handler=bind_tcp_handler,
                 use_http_stager=LINUX_STAGERS),
@@ -75,6 +78,7 @@ AVAILABLE_SHELLS = [
                 "udp",
                 BIND_PERL_UDP(),
                 system="linux",
+                lang="perl",
                 arch="Independent", 
                 use_handler=None,
                 use_http_stager=LINUX_STAGERS),
@@ -85,6 +89,7 @@ AVAILABLE_SHELLS = [
                 "tcp",
                 BIND_PHP_TCP(),
                 system="linux",
+                lang="php",
                 arch="Independent",
                 use_handler=bind_tcp_handler,
                 use_http_stager=LINUX_STAGERS),
@@ -95,6 +100,7 @@ AVAILABLE_SHELLS = [
                 "udp", 
                 BIND_PHP_UDP(),
                 system="linux",
+                lang="php",
                 arch="Independent",
                 use_handler=None,
                 use_http_stager=LINUX_STAGERS),
@@ -105,6 +111,7 @@ AVAILABLE_SHELLS = [
                 "tcp",
                 BIND_RUBY_TCP(),
                 system="linux",
+                lang="ruby",
                 arch="Independent",
                 use_handler=bind_tcp_handler,
                 use_http_stager=LINUX_STAGERS),
@@ -115,6 +122,7 @@ AVAILABLE_SHELLS = [
                 "udp",
                 BIND_RUBY_UDP(),
                 system="linux",
+                lang="ruby",
                 arch="Independent",
                 use_handler=None,
                 use_http_stager=LINUX_STAGERS),
@@ -125,6 +133,7 @@ AVAILABLE_SHELLS = [
                 "tcp",
                 BIND_NETCAT_TCP(),
                 system="linux",
+                lang="bash",
                 arch="Independent",
                 use_handler=bind_tcp_handler,
                 use_http_stager=LINUX_STAGERS),
@@ -135,6 +144,7 @@ AVAILABLE_SHELLS = [
                 "udp",
                 BIND_NETCAT_OPENBSD_UDP(),
                 system="linux",
+                lang="bash",
                 arch="Independent",
                 use_handler=None,
                 use_http_stager=LINUX_STAGERS),
@@ -145,6 +155,7 @@ AVAILABLE_SHELLS = [
                 "tcp",
                 BIND_NETCAT_TRADITIONAL_TCP(),
                 system="linux",
+                lang="bash",
                 arch="Independent",
                 use_handler=bind_tcp_handler,
                 use_http_stager=LINUX_STAGERS),
@@ -155,6 +166,7 @@ AVAILABLE_SHELLS = [
                 "tcp",
                 BIND_AWK_TCP(),
                 system="linux",
+                lang="bash",
                 arch="Independent",
                 use_handler=bind_tcp_handler,
                 use_http_stager=LINUX_STAGERS),
@@ -165,6 +177,7 @@ AVAILABLE_SHELLS = [
                 "udp",
                 BIND_SOCAT_UDP(),
                 system="linux",
+                lang="bash",
                 arch="Independent",
                 use_handler=None,
                 use_http_stager=LINUX_STAGERS),
@@ -175,6 +188,7 @@ AVAILABLE_SHELLS = [
                 "tcp",
                 BIND_POWERSHELL_TCP(),
                 system="windows",
+                lang="powershell",
                 arch="x86 / x64",
                 use_handler=bind_tcp_handler,
                 use_http_stager=[WINDOWS_STAGERS[0]]),
@@ -185,6 +199,7 @@ AVAILABLE_SHELLS = [
                 "tcp",
                 BIND_POWERSHELL_NISHANG_TCP(),
                 system="windows",
+                lang="powershell",
                 arch="x86 / x64",
                 use_handler=bind_tcp_handler,
                 use_http_stager=[(1, PurePowershell_HTTP_Stager)])
@@ -198,6 +213,7 @@ AVAILABLE_SHELLS = [
                 "tcp",
                 REV_PYTHON_TCP(),
                 system="linux",
+                lang="python",
                 arch="Independent",
                 use_handler=reverse_tcp_pty_handler,
                 use_http_stager=LINUX_STAGERS),
@@ -208,6 +224,7 @@ AVAILABLE_SHELLS = [
                 "udp",
                 REV_PYTHON_UDP(),
                 system="linux",
+                lang="python",
                 arch="Independent",
                 use_handler=None,
                 use_http_stager=LINUX_STAGERS),
@@ -218,6 +235,7 @@ AVAILABLE_SHELLS = [
                 "tcp",
                 REV_PHP_TCP(),
                 system="linux",
+                lang="php",
                 arch="Independent",
                 use_handler=reverse_tcp_handler,
                 use_http_stager=LINUX_STAGERS),
@@ -228,6 +246,7 @@ AVAILABLE_SHELLS = [
                 "tcp",
                 REV_RUBY_TCP(),
                 system="linux",
+                lang="ruby",
                 arch="Independent",
                 use_handler=reverse_tcp_handler,
                 use_http_stager=LINUX_STAGERS),
@@ -238,6 +257,7 @@ AVAILABLE_SHELLS = [
                 "tcp",
                 REV_PERL_TCP(),
                 system="linux",
+                lang="perl",
                 arch="Independent",
                 use_handler=reverse_tcp_handler,
                 use_http_stager=LINUX_STAGERS),
@@ -248,6 +268,7 @@ AVAILABLE_SHELLS = [
                 "tcp",
                 REV_PERL_TCP_2(),
                 system="linux",
+                lang="perl",
                 arch="Independent",
                 use_handler=reverse_tcp_handler,
                 use_http_stager=LINUX_STAGERS),
@@ -258,6 +279,7 @@ AVAILABLE_SHELLS = [
                 "udp",
                 REV_PERL_UDP(),
                 system="linux",
+                lang="perl",
                 arch="Independent",
                 use_handler=None,
                 use_http_stager=LINUX_STAGERS),
@@ -268,6 +290,7 @@ AVAILABLE_SHELLS = [
                 "tcp",
                 BASH_TCP(),
                 system="linux",
+                lang="bash",
                 arch="Independent",
                 use_handler=reverse_tcp_handler,
                 use_http_stager=LINUX_STAGERS),
@@ -278,6 +301,7 @@ AVAILABLE_SHELLS = [
                 "tcp",
                 REV_POWERSHELL_TCP(),
                 system="windows",
+                lang="powershell",
                 arch="x86 / x64",
                 use_handler=reverse_tcp_handler,
                 use_http_stager=[WINDOWS_STAGERS[0]]),
@@ -288,6 +312,7 @@ AVAILABLE_SHELLS = [
                 "tcp",
                 REVERSE_TCLSH(),
                 system="linux",
+                lang="bash",
                 arch="Independent",
                 use_handler=reverse_tcp_handler,
                 use_http_stager=LINUX_STAGERS),
@@ -298,6 +323,7 @@ AVAILABLE_SHELLS = [
                 "tcp",
                 REVERSE_NCAT(),
                 system="linux",
+                lang="bash",
                 arch="Independent",
                 use_handler=reverse_tcp_handler,
                 use_http_stager=LINUX_STAGERS),
@@ -308,6 +334,7 @@ AVAILABLE_SHELLS = [
                 "udp",
                 REVERSE_NC_UDP_1(),
                 system="linux",
+                lang="bash",
                 arch="Independent",
                 use_handler=None,
                 use_http_stager=LINUX_STAGERS),
@@ -318,6 +345,7 @@ AVAILABLE_SHELLS = [
                 "tcp",
                 REVERSE_NC_TRADITIONAL_1(),
                 system="linux",
+                lang="bash",
                 arch="Independent",
                 use_handler=reverse_tcp_handler,
                 use_http_stager=LINUX_STAGERS),
@@ -328,6 +356,7 @@ AVAILABLE_SHELLS = [
                 "tcp",
                 REVERSE_MKFIFO_NC(),
                 system="linux",
+                lang="bash",
                 arch="Independent",
                 use_handler=reverse_tcp_handler,
                 use_http_stager=LINUX_STAGERS),
@@ -338,6 +367,7 @@ AVAILABLE_SHELLS = [
                 "tcp",
                 REVERSE_MKNOD_NC(),
                 system="linux",
+                lang="bash",
                 arch="Independent",
                 use_handler=reverse_tcp_handler,
                 use_http_stager=LINUX_STAGERS),
@@ -348,6 +378,7 @@ AVAILABLE_SHELLS = [
                 "tcp",
                 REVERSE_MKFIFO_TELNET(),
                 system="linux",
+                lang="bash",
                 arch="Independent",
                 use_handler=reverse_tcp_handler,
                 use_http_stager=LINUX_STAGERS),
@@ -358,6 +389,7 @@ AVAILABLE_SHELLS = [
                 "tcp",
                 REVERSE_MKNOD_TELNET(),
                 system="linux",
+                lang="bash",
                 arch="Independent",
                 use_handler=reverse_tcp_handler,
                 use_http_stager=LINUX_STAGERS),
@@ -368,6 +400,7 @@ AVAILABLE_SHELLS = [
                 "tcp",
                 REVERSE_SOCAT(),
                 system="linux",
+                lang="bash",
                 arch="Independent",
                 use_handler=reverse_tcp_handler,
                 use_http_stager=LINUX_STAGERS),
@@ -378,6 +411,7 @@ AVAILABLE_SHELLS = [
                 "tcp",
                 REVERSE_AWK(),
                 system="linux",
+                lang="bash",
                 arch="Independent",
                 use_handler=reverse_tcp_handler,
                 use_http_stager=LINUX_STAGERS),
@@ -388,6 +422,7 @@ AVAILABLE_SHELLS = [
                 "udp",
                 REVERSE_AWK_UDP(),
                 system="linux",
+                lang="bash",
                 arch="Independent",
                 use_handler=None,
                 use_http_stager=LINUX_STAGERS),
@@ -398,6 +433,7 @@ AVAILABLE_SHELLS = [
                 "tcp",
                 REVERSE_WINDOWS_NCAT_TCP(),
                 system="windows",
+                lang="cmd",
                 arch="x86 / x64",
                 use_handler=reverse_tcp_handler,
                 use_http_stager=list(filter(lambda x: x[0] not in [3, 1], WINDOWS_STAGERS))),
@@ -408,6 +444,7 @@ AVAILABLE_SHELLS = [
                 "tcp",
                 REVERSE_WINDOWS_BLOODSEEKER_TCP(),
                 system="windows",
+                lang="powershell",
                 arch="x64",
                 use_handler=None,
                 use_http_stager=[(1, PurePowershell_HTTP_Stager)]),  # This will only work with powershell.
@@ -418,6 +455,7 @@ AVAILABLE_SHELLS = [
                 "tcp",
                 REVERSE_POWERSHELL_TINY_TCP(),
                 system="windows",
+                lang="powershell",
                 arch="x86 / x64",
                 use_handler=reverse_tcp_handler,
                 use_http_stager=[WINDOWS_STAGERS[0]]),
@@ -428,6 +466,7 @@ AVAILABLE_SHELLS = [
                 "tcp",
                 REVERSE_POWERSHELL_NISHANG_TCP(),
                 system="windows",
+                lang="powershell",
                 arch="x86 / x64",
                 use_handler=reverse_tcp_handler,
                 use_http_stager=[(1, PurePowershell_HTTP_Stager)]),
@@ -438,6 +477,7 @@ AVAILABLE_SHELLS = [
                 "icmp",
                 REVERSE_POWERSHELL_ICMP(),
                 system="windows",
+                lang="powershell",
                 arch="x86 / x64",
                 use_handler=None,
                 use_http_stager=[(1, PurePowershell_HTTP_Stager)]),
@@ -448,6 +488,7 @@ AVAILABLE_SHELLS = [
                 "tcp",
                 REVERSE_WINDOWS_BAT2METERPRETER_TCP(),
                 system="windows",
+                lang="cmd",
                 arch="x86 / x64",
                 use_handler=None,
                 use_http_stager=list(filter(lambda x: x[0] not in [1, 3], WINDOWS_STAGERS))),
@@ -458,6 +499,7 @@ AVAILABLE_SHELLS = [
                 "tcp",
                 REVERSE_GROOVY_TCP(),
                 system="multi",
+                lang="grovvy",
                 arch="Independent",
                 use_handler=reverse_tcp_handler,
                 use_http_stager=list(filter(lambda x: x[0] not in [1], WINDOWS_STAGERS))),
@@ -532,7 +574,8 @@ def select_shell(args, shell_type, shell_index):
             if shell == shell_index:
                 code = obj.code
                 name = obj.name
-                rev = ReverseShell(name, args, code)
+                lang = obj.lang
+                rev = ReverseShell(name, lang, args, code)
                 generated = rev.get()
                 obj.payload = generated
                 obj.decompSize = rev.decompSize
@@ -545,7 +588,8 @@ def select_shell(args, shell_type, shell_index):
             if shell == shell_index:
                 code = obj.code
                 name = obj.name
-                bind = BindShell(name, args, code)
+                lang = obj.lang
+                bind = BindShell(name, lang, args, code)
                 generated = bind.get()
                 obj.payload = generated
                 obj.decompSize = bind.decompSize
@@ -610,6 +654,12 @@ def main():
     encoders.add_argument("--base64", action="store_true", required=False, help="Encode command in base64.")
     encoders.add_argument("--urlencode", action="store_true", required=False,
                           help="Encode the command in URL encoding.")
+
+    # Obfuscation options
+    obfuscation = parser.add_argument_group("Obfuscation Options")
+    obfuscation.add_argument("--ipfuscate", action="store_true", required=False, help="Obfuscate IP address.")
+    obfuscation.add_argument("--obfuscate-small", action="store_true", default=False, required=False, help="Obfuscated \
+    command will be as small as possible.")
 
     # Use handler if possible.
     parser.add_argument("--handler", action="store_true", help="Use handler, if possible.", default=False,
