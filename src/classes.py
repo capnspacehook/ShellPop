@@ -131,10 +131,6 @@ def bzip2_wrapper(code, args):
         code = code.encode("base64").replace("\n", "")
         code = "echo {0}|base64 -d|bzcat|{1}".format(code, shell)
 
-            code = """VAR1="";for VAR2 in $(echo {0}|sed "s/../&\\n/g"); do VAR1=$VAR1$(echo -e $(awk "BEGIN {{printf \\"%x\\n\\", xor(0x$VAR2, {1})}}"|sed "s/../\\\\\\\\x&/g"));done;echo $VAR1|{2}""".format(hexlify(xor(code, args.xor)), hex(args.xor), shell)
-            code = shell + " -c '" + code + "'"
-            code = randomize_vars(code, args.obfuscate_small)
-       
     return code
 
 
